@@ -42,3 +42,53 @@ def top_sort(arr):
     arr.sort()
     return arr
 ```
+Если же использовать не готовую реализацию, то лучше всего подойдет быстрая сортировка с некоторыми улучшениями (выбор медианы из трёх в качестве опорного элемента (для снижения вероятности худшего случая) и переход к сортировке вставками на небольших подмассивах (поскольку это быстрее, чем рекурсивно вызывать быструю сортировку)).
+```
+def quicksort(arr, low, high):
+    if high - low < 10: 
+        insertion_sort(arr, low, high)
+    elif low < high:
+        pivot = median_of_three(arr, low, high)
+        pi = partition(arr, low, high, pivot)
+        quicksort(arr, low, pi - 1)
+        quicksort(arr, pi + 1, high)
+
+def median_of_three(arr, low, high):
+    mid = (low + high) // 2
+    if arr[low] > arr[mid]:
+        arr[low], arr[mid] = arr[mid], arr[low]
+    if arr[low] > arr[high]:
+        arr[low], arr[high] = arr[high], arr[low]
+    if arr[mid] > arr[high]:
+        arr[mid], arr[high] = arr[high], arr[mid]
+    arr[mid], arr[high - 1] = arr[high - 1], arr[mid]
+    return arr[high - 1]
+
+def partition(arr, low, high, pivot):
+    left = low
+    right = high - 1
+    while True:
+        while arr[left] < pivot:
+            left += 1
+        while arr[right] > pivot:
+            right -= 1
+        if left >= right:
+            break
+        arr[left], arr[right] = arr[right], arr[left]
+    arr[left], arr[high - 1] = arr[high - 1], arr[left]
+    return left
+
+def insertion_sort(arr, low, high):
+    for i in range(low + 1, high + 1):
+        key = arr[i]
+        j = i - 1
+        while j >= low and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+
+def efficient_sort(arr):
+    quicksort(arr, 0, len(arr) - 1)
+    return arr
+
+```
